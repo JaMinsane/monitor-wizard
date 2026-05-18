@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MonitorWizard (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MonitorWizard (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
