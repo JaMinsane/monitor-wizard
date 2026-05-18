@@ -12,6 +12,7 @@ namespace MonitorWizard;
 public sealed partial class MainWindow : Window
 {
     private GlobalHotKey? _toggleHotKey;
+    private UsbDeviceWatcher? _usbDeviceWatcher;
 
     public MainWindow()
     {
@@ -31,6 +32,22 @@ public sealed partial class MainWindow : Window
                 $"{DateTime.Now:HH:mm:ss} [ERROR] Ctrl+Alt+F12 could not be registered.");
         }
 
+        _usbDeviceWatcher = new UsbDeviceWatcher();
+        _usbDeviceWatcher.DeviceDetected += UsbDeviceWatcher_DeviceDetected;
+        try
+        {
+            _usbDeviceWatcher.Start();
+            AppServices.MonitorSwitch.LogEntries.Insert(
+                0,
+                $"{DateTime.Now:HH:mm:ss} USB auto switch watcher started.");
+        }
+        catch (Exception ex)
+        {
+            AppServices.MonitorSwitch.LogEntries.Insert(
+                0,
+                $"{DateTime.Now:HH:mm:ss} [ERROR] USB auto switch watcher could not start: {ex.Message}");
+        }
+
         Closed += MainWindow_Closed;
     }
 
@@ -39,8 +56,24 @@ public sealed partial class MainWindow : Window
         await AppServices.MonitorSwitch.TogglePcLaptopAsync();
     }
 
+    private void UsbDeviceWatcher_DeviceDetected(string deviceName)
+    {
+        DispatcherQueue.TryEnqueue(async () =>
+        {
+            await Task.Delay(200);
+            await AppServices.MonitorSwitch.SwitchToPcFromUsbAsync(deviceName);
+        });
+    }
+
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
+        if (_usbDeviceWatcher is not null)
+        {
+            _usbDeviceWatcher.DeviceDetected -= UsbDeviceWatcher_DeviceDetected;
+            _usbDeviceWatcher.Dispose();
+            _usbDeviceWatcher = null;
+        }
+
         _toggleHotKey?.Dispose();
         _toggleHotKey = null;
     }

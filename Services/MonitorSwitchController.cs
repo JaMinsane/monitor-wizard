@@ -23,6 +23,11 @@ public sealed class MonitorSwitchController
         return SwitchToAsync(MonitorInputSource.DisplayPort, "PC / DisplayPort", "Manual button");
     }
 
+    public Task SwitchToPcFromUsbAsync(string deviceName)
+    {
+        return SwitchToAsync(MonitorInputSource.DisplayPort, "PC / DisplayPort", $"USB device: {deviceName}");
+    }
+
     public Task SwitchToLaptopAsync()
     {
         return SwitchToAsync(MonitorInputSource.Hdmi, "Laptop / HDMI", "Manual button");
@@ -56,7 +61,10 @@ public sealed class MonitorSwitchController
         try
         {
             var results = await Task.Run(() => _monitorInputSwitcher.SwitchAll(inputSource));
-            _lastRequestedInputSource = inputSource;
+            if (results.Any(result => result.Success))
+            {
+                _lastRequestedInputSource = inputSource;
+            }
 
             foreach (var result in results.Reverse())
             {

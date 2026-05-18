@@ -9,6 +9,7 @@ public sealed class GlobalHotKey : IDisposable
     private const int HotKeyId = 1200;
     private const uint ModAlt = 0x0001;
     private const uint ModControl = 0x0002;
+    private const uint ModNoRepeat = 0x4000;
     private const uint VkF12 = 0x7B;
     private const uint WmHotKey = 0x0312;
 
@@ -39,7 +40,7 @@ public sealed class GlobalHotKey : IDisposable
             return false;
         }
 
-        _isRegistered = NativeMethods.RegisterHotKey(_windowHandle, HotKeyId, ModControl | ModAlt, VkF12);
+        _isRegistered = NativeMethods.RegisterHotKey(_windowHandle, HotKeyId, ModControl | ModAlt | ModNoRepeat, VkF12);
 
         if (!_isRegistered)
         {

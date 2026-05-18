@@ -87,7 +87,7 @@ Fase 3:
   - Open Monitor Wizard
   - Switch to PC
   - Switch to Laptop
-  - Auto switch enabled
+  - Auto switch enabled/disabled. Enabled by default.
   - Exit
 - Presionar X en la ventana principal minimizará a la bandeja al tray icon, no cerrará la app.
 
