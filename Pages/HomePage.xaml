@@ -8,12 +8,86 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="24,16,24,16" RowSpacing="24">
+    <Grid
+        Padding="24,16,24,16"
+        RowSpacing="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Home" />
-        <TextBlock Grid.Row="1" Text="This is the Home page" />
+
+        <StackPanel Spacing="4">
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Monitor Wizard" />
+            <TextBlock
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="Manual monitor input switching" />
+        </StackPanel>
+
+        <StackPanel
+            Grid.Row="1"
+            Orientation="Horizontal"
+            Spacing="12">
+            <Button
+                x:Name="SwitchToPcButton"
+                Click="SwitchToPcButton_Click"
+                MinWidth="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="16" Glyph="&#xE977;" />
+                    <TextBlock Text="Switch to PC / DisplayPort" />
+                </StackPanel>
+            </Button>
+            <Button
+                x:Name="SwitchToLaptopButton"
+                Click="SwitchToLaptopButton_Click"
+                MinWidth="180">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon FontSize="16" Glyph="&#xE7F8;" />
+                    <TextBlock Text="Switch to Laptop / HDMI" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <ProgressRing
+            x:Name="SwitchProgress"
+            Grid.Row="2"
+            Width="28"
+            Height="28"
+            HorizontalAlignment="Left"
+            IsActive="False"
+            Visibility="Collapsed" />
+
+        <Border
+            Grid.Row="3"
+            Padding="16"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Results log" />
+
+                <ListView
+                    x:Name="LogList"
+                    Grid.Row="1"
+                    MinHeight="260"
+                    ItemsSource="{x:Bind LogEntries}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock
+                                FontFamily="Consolas"
+                                Text="{x:Bind}"
+                                TextWrapping="WrapWholeWords" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
