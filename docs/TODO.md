@@ -96,7 +96,9 @@ Esta app usa WinUI 3 mandatoriamente y esta orientada a Windows 11.
 Ya se tiene instalado el paquete System.Management. Si se requiere agregar otros paquetes, estan disponibles en NuGet
 
 Al finalizar se ejecuta:
-dotnet publish -c Release -r win-x64 -p:PublishProfile=Portable-x64
+```bash
+dotnet publish -c Release -r win-x64 -p:PublishProfile=win-x64-portable
+```
 
 donde Portable-x64 es un perfil de publicación:
 
