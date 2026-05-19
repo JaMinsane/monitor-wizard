@@ -94,3 +94,26 @@ Fase 3:
 Notas importantes:
 Esta app usa WinUI 3 mandatoriamente y esta orientada a Windows 11.
 Ya se tiene instalado el paquete System.Management. Si se requiere agregar otros paquetes, estan disponibles en NuGet
+
+Al finalizar se ejecuta:
+dotnet publish -c Release -r win-x64 -p:PublishProfile=Portable-x64
+
+donde Portable-x64 es un perfil de publicación:
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <PublishProtocol>FileSystem</PublishProtocol>
+        <Platform>x64</Platform>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+        <PublishDir>publish\win-x64\</PublishDir>
+        <SelfContained>true</SelfContained>
+        <WindowsPackageType>None</WindowsPackageType>
+        <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishSingleFile>false</PublishSingleFile>
+        <DebugType>None</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+</Project>
