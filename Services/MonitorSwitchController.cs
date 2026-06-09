@@ -43,10 +43,14 @@ public sealed class MonitorSwitchController
             ? "PC / DisplayPort"
             : "Laptop / HDMI";
 
-        return SwitchToAsync(nextInputSource, label, "Ctrl+Alt+F12");
+        return SwitchToAsync(nextInputSource, label, "Ctrl+Alt+F12", primaryOnly: true);
     }
 
-    private async Task SwitchToAsync(MonitorInputSource inputSource, string label, string trigger)
+    private async Task SwitchToAsync(
+        MonitorInputSource inputSource,
+        string label,
+        string trigger,
+        bool primaryOnly = false)
     {
         if (IsSwitching)
         {
@@ -60,7 +64,10 @@ public sealed class MonitorSwitchController
 
         try
         {
-            var results = await Task.Run(() => _monitorInputSwitcher.SwitchAll(inputSource));
+            var results = await Task.Run(() => primaryOnly
+                ? _monitorInputSwitcher.SwitchPrimary(inputSource)
+                : _monitorInputSwitcher.SwitchAll(inputSource));
+
             if (results.Any(result => result.Success))
             {
                 _lastRequestedInputSource = inputSource;

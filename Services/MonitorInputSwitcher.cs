@@ -16,6 +16,16 @@ public sealed class MonitorInputSwitcher
 
     public IReadOnlyList<MonitorSwitchResult> SwitchAll(MonitorInputSource inputSource)
     {
+        return Switch(inputSource, primaryOnly: false);
+    }
+
+    public IReadOnlyList<MonitorSwitchResult> SwitchPrimary(MonitorInputSource inputSource)
+    {
+        return Switch(inputSource, primaryOnly: true);
+    }
+
+    private IReadOnlyList<MonitorSwitchResult> Switch(MonitorInputSource inputSource, bool primaryOnly)
+    {
         var displayHandles = new List<IntPtr>();
         var results = new List<MonitorSwitchResult>();
 
@@ -39,6 +49,12 @@ public sealed class MonitorInputSwitcher
 
         foreach (var displayHandle in displayHandles)
         {
+            if (primaryOnly && !IsPrimaryMonitor(displayHandle))
+            {
+                monitorNumber++;
+                continue;
+            }
+
             if (!NativeMethods.GetNumberOfPhysicalMonitorsFromHMONITOR(displayHandle, out var physicalMonitorCount) ||
                 physicalMonitorCount == 0)
             {
@@ -100,19 +116,57 @@ public sealed class MonitorInputSwitcher
 
         if (results.Count == 0)
         {
-            results.Add(new MonitorSwitchResult(0, "Display enumeration", false, "No monitors were detected."));
+            var message = primaryOnly
+                ? "No primary monitor was detected."
+                : "No monitors were detected.";
+
+            results.Add(new MonitorSwitchResult(0, "Display enumeration", false, message));
         }
 
         return results;
     }
 
+    private static bool IsPrimaryMonitor(IntPtr displayHandle)
+    {
+        var monitorInfo = new NativeMethods.MonitorInfoEx
+        {
+            Size = Marshal.SizeOf<NativeMethods.MonitorInfoEx>()
+        };
+
+        return NativeMethods.GetMonitorInfo(displayHandle, ref monitorInfo) &&
+            (monitorInfo.Flags & NativeMethods.MonitorInfoPrimary) == NativeMethods.MonitorInfoPrimary;
+    }
+
     private static partial class NativeMethods
     {
+        internal const uint MonitorInfoPrimary = 0x00000001;
+
         internal delegate bool MonitorEnumProc(
             IntPtr monitorHandle,
             IntPtr deviceContextHandle,
             IntPtr rect,
             IntPtr data);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct Rect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct MonitorInfoEx
+        {
+            public int Size;
+            public Rect Monitor;
+            public Rect Work;
+            public uint Flags;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string DeviceName;
+        }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         internal struct PhysicalMonitor
@@ -127,9 +181,15 @@ public sealed class MonitorInputSwitcher
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool EnumDisplayMonitors(
             IntPtr deviceContextHandle,
-            IntPtr clippingRect,
-            MonitorEnumProc callback,
-            IntPtr data);
+                IntPtr clippingRect,
+                MonitorEnumProc callback,
+                IntPtr data);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetMonitorInfo(
+            IntPtr monitorHandle,
+            ref MonitorInfoEx monitorInfo);
 
         [DllImport("dxva2.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

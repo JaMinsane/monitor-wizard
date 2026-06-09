@@ -18,7 +18,7 @@ public sealed partial class MainWindow : Window
     private UsbDeviceWatcher? _usbDeviceWatcher;
     private TaskbarIcon? _trayIcon;
     private ToggleMenuFlyoutItem? _autoSwitchMenuItem;
-    private bool _isAutoSwitchEnabled = true;
+    private bool _isAutoSwitchEnabled;
     private bool _isExiting;
 
     public ICommand OpenWindowCommand { get; }
@@ -51,8 +51,6 @@ public sealed partial class MainWindow : Window
                 0,
                 $"{DateTime.Now:HH:mm:ss} [ERROR] Ctrl+Alt+F12 could not be registered.");
         }
-
-        SetAutoSwitchEnabled(true);
 
         AppWindow.Closing += AppWindow_Closing;
         Closed += MainWindow_Closed;
@@ -175,7 +173,7 @@ public sealed partial class MainWindow : Window
         _autoSwitchMenuItem = new ToggleMenuFlyoutItem
         {
             Text = "Auto switch enabled",
-            IsChecked = true,
+            IsChecked = _isAutoSwitchEnabled,
             Command = ToggleAutoSwitchCommand
         };
 
