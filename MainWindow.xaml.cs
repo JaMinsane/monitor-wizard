@@ -242,6 +242,9 @@ public sealed partial class MainWindow : Window
                 case "home":
                     NavFrame.Navigate(typeof(HomePage));
                     break;
+                case "displays":
+                    NavFrame.Navigate(typeof(DisplaysPage));
+                    break;
                 case "about":
                     NavFrame.Navigate(typeof(AboutPage));
                     break;
